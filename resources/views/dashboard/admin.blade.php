@@ -63,6 +63,9 @@
         align-items:center;
         gap:8px;
     }
+    canvas {
+    max-height: 200px;
+    }
 
     .chart-title::before {
         content:'';
@@ -273,3 +276,113 @@
 </div>
 
 @endsection
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    Chart.defaults.color = "rgba(255,255,255,0.6)";
+    Chart.defaults.borderColor = "rgba(255,255,255,0.05)";
+
+    // ================= GENRE (BAR) =================
+    const genreCtx = document.getElementById('genreChart').getContext('2d');
+
+    new Chart(genreCtx, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($genreCounts->keys()) !!},
+            datasets: [{
+                data: {!! json_encode($genreCounts->values()) !!},
+                backgroundColor: '#2979ff',
+                borderRadius: 6,
+                barThickness: 18
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false }},
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: 'rgba(255,255,255,0.5)' }
+                },
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { display: false }
+                }
+            }
+        }
+    });
+
+    // ================= RATING (DOUGHNUT) =================
+    const ratingCtx = document.getElementById('ratingChart').getContext('2d');
+
+    new Chart(ratingCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {!! json_encode(array_keys($ratingRanges)) !!},
+            datasets: [{
+                data: {!! json_encode(array_values($ratingRanges)) !!},
+                backgroundColor: [
+                    '#ff4d4d',
+                    '#ff884d',
+                    '#ffd24d',
+                    '#4dff88',
+                    '#2979ff'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: 'rgba(255,255,255,0.6)',
+                        boxWidth: 10
+                    }
+                }
+            }
+        }
+    });
+
+    // ================= TIME (LINE - PREMIUM) =================
+    const timeCtx = document.getElementById('timeChart').getContext('2d');
+
+    // gradient
+    const gradient = timeCtx.createLinearGradient(0, 0, 0, 220);
+    gradient.addColorStop(0, 'rgba(41,121,255,0.5)');
+    gradient.addColorStop(1, 'rgba(41,121,255,0)');
+
+    new Chart(timeCtx, {
+        type: 'line',
+        data: {
+            labels: {!! json_encode($moviesOverTime->pluck('month')) !!},
+            datasets: [{
+                data: {!! json_encode($moviesOverTime->pluck('count')) !!},
+                borderColor: '#2979ff',
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false }},
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: 'rgba(255,255,255,0.5)' }
+                },
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { display: false }
+                }
+            }
+        }
+    });
+
+});
+</script>
